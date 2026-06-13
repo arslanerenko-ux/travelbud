@@ -1,1 +1,474 @@
-# travelbud
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TravelBud — AI-Powered Budget Travel</title>
+<meta name="description" content="TravelBud finds you the cheapest flights, best hotels, and builds your perfect trip itinerary — all powered by AI."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #07090f;
+    --bg2: #0b0f1e;
+    --card: #0e1320;
+    --border: #1a2540;
+    --accent: #00c2ff;
+    --accent2: #0055ff;
+    --green: #00e5a0;
+    --yellow: #ffb340;
+    --text: #e8f0fe;
+    --muted: #5a6a8a;
+    --muted2: #8899bb;
+  }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 40px;
+    background: rgba(7,9,15,0.85); backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent2), var(--accent)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .logo-text { font-size: 20px; font-weight: 900; letter-spacing: -0.04em; background: linear-gradient(135deg, #fff 40%, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .nav-links { display: flex; align-items: center; gap: 32px; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta { background: linear-gradient(135deg, var(--accent2), var(--accent)); color: #fff !important; padding: 9px 20px; border-radius: 8px; font-weight: 700 !important; font-size: 13px !important; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 120px 24px 80px; position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; top: -200px; left: 50%; transform: translateX(-50%);
+    width: 800px; height: 800px;
+    background: radial-gradient(circle, #0055ff18 0%, #00c2ff08 40%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #0055ff18; border: 1px solid #0055ff44;
+    color: var(--accent); padding: 6px 16px; border-radius: 99px;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  .hero-badge span { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.4)} }
+  .hero h1 {
+    font-size: clamp(42px, 8vw, 80px); font-weight: 900; letter-spacing: -0.04em; line-height: 1.05;
+    margin-bottom: 24px; max-width: 800px;
+  }
+  .hero h1 .grad { background: linear-gradient(135deg, var(--accent) 0%, #7b61ff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero p { font-size: clamp(16px, 2.5vw, 20px); color: var(--muted2); max-width: 560px; line-height: 1.65; margin-bottom: 40px; }
+  .hero-btns { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    color: #fff; padding: 15px 32px; border-radius: 12px; font-weight: 700; font-size: 16px;
+    text-decoration: none; box-shadow: 0 8px 32px #0055ff44; transition: transform 0.2s, box-shadow 0.2s;
+    border: none; cursor: pointer;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 40px #0055ff66; }
+  .btn-secondary {
+    background: transparent; color: var(--text); padding: 15px 32px; border-radius: 12px;
+    font-weight: 600; font-size: 16px; text-decoration: none;
+    border: 1.5px solid var(--border); transition: border-color 0.2s, background 0.2s;
+  }
+  .btn-secondary:hover { border-color: var(--accent); background: #00c2ff08; }
+
+  /* STATS BAR */
+  .stats {
+    display: flex; justify-content: center; gap: 0; flex-wrap: wrap;
+    margin: 60px auto 0; max-width: 700px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 18px; overflow: hidden;
+  }
+  .stat { flex: 1; min-width: 140px; padding: 28px 20px; text-align: center; border-right: 1px solid var(--border); }
+  .stat:last-child { border-right: none; }
+  .stat-num { font-size: 28px; font-weight: 900; color: var(--accent); letter-spacing: -0.03em; }
+  .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; font-weight: 500; }
+
+  /* SECTION */
+  section { padding: 100px 24px; max-width: 1100px; margin: 0 auto; }
+  .section-label { color: var(--accent); font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 14px; }
+  .section-title { font-size: clamp(28px, 5vw, 48px); font-weight: 900; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 16px; }
+  .section-sub { color: var(--muted2); font-size: 17px; line-height: 1.65; max-width: 520px; }
+
+  /* FEATURES */
+  .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 56px; }
+  .feature-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 28px;
+    transition: border-color 0.3s, transform 0.3s; position: relative; overflow: hidden;
+  }
+  .feature-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent));
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .feature-card:hover { border-color: #00c2ff44; transform: translateY(-4px); }
+  .feature-card:hover::before { opacity: 1; }
+  .feature-icon { font-size: 32px; margin-bottom: 16px; }
+  .feature-title { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+  .feature-desc { color: var(--muted2); font-size: 14px; line-height: 1.7; }
+
+  /* HOW IT WORKS */
+  .how-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+  .steps { display: flex; flex-direction: column; gap: 0; }
+  .step { display: flex; gap: 20px; padding: 24px 0; border-bottom: 1px solid var(--border); }
+  .step:last-child { border-bottom: none; }
+  .step-num { width: 36px; height: 36px; min-width: 36px; background: linear-gradient(135deg, var(--accent2), var(--accent)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; color: #fff; }
+  .step-content h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .step-content p { color: var(--muted2); font-size: 14px; line-height: 1.65; }
+  .phone-mock {
+    background: var(--card); border: 1px solid var(--border); border-radius: 28px; padding: 24px;
+    box-shadow: 0 40px 80px #00000088, 0 0 60px #0055ff22;
+  }
+  .phone-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+  .phone-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .mock-result { background: #080c18; border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+  .mock-result.best { border-color: #00e5a044; background: #0a1a0a; }
+  .mock-airline { font-size: 13px; font-weight: 700; color: var(--accent); }
+  .mock-route { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .mock-price { font-size: 18px; font-weight: 800; }
+  .mock-price.best { color: var(--green); }
+  .mock-badge { font-size: 10px; color: var(--green); font-weight: 700; margin-bottom: 2px; }
+
+  /* PRICING */
+  .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 56px; }
+  .price-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 32px; }
+  .price-card.popular { border-color: var(--accent); position: relative; box-shadow: 0 0 40px #00c2ff18; }
+  .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, var(--accent2), var(--accent)); color: #fff; font-size: 11px; font-weight: 700; padding: 4px 16px; border-radius: 99px; white-space: nowrap; }
+  .price-name { font-size: 14px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; }
+  .price-amount { font-size: 42px; font-weight: 900; letter-spacing: -0.04em; margin-bottom: 4px; }
+  .price-amount span { font-size: 18px; color: var(--muted); font-weight: 500; }
+  .price-desc { color: var(--muted2); font-size: 13px; margin-bottom: 24px; }
+  .price-features { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+  .price-features li { font-size: 14px; color: var(--muted2); display: flex; gap: 10px; align-items: flex-start; }
+  .price-features li::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; }
+  .price-btn { display: block; text-align: center; padding: 13px; border-radius: 10px; font-weight: 700; font-size: 15px; text-decoration: none; transition: all 0.2s; cursor: pointer; border: none; width: 100%; }
+  .price-btn.outline { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
+  .price-btn.outline:hover { border-color: var(--accent); }
+  .price-btn.filled { background: linear-gradient(135deg, var(--accent2), var(--accent)); color: #fff; box-shadow: 0 4px 20px #0055ff44; }
+
+  /* WAITLIST */
+  .waitlist-wrap {
+    text-align: center; padding: 100px 24px;
+    background: linear-gradient(180deg, var(--bg) 0%, #0b1530 50%, var(--bg) 100%);
+    position: relative; overflow: hidden;
+  }
+  .waitlist-wrap::before {
+    content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, #0055ff12 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .waitlist-inner { max-width: 560px; margin: 0 auto; position: relative; }
+  .waitlist-form { display: flex; gap: 10px; margin-top: 32px; flex-wrap: wrap; justify-content: center; }
+  .waitlist-input {
+    flex: 1; min-width: 220px; background: var(--card); border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 14px 18px; color: var(--text); font-size: 15px; outline: none;
+    font-family: 'Inter', sans-serif; transition: border-color 0.2s;
+  }
+  .waitlist-input:focus { border-color: var(--accent); }
+  .waitlist-input::placeholder { color: var(--muted); }
+  #waitlist-success { display: none; color: var(--green); font-weight: 600; margin-top: 16px; font-size: 15px; }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border); padding: 40px 40px;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: gap;
+    color: var(--muted); font-size: 13px;
+  }
+  footer a { color: var(--muted); text-decoration: none; }
+  footer a:hover { color: var(--text); }
+
+  /* MOBILE */
+  @media(max-width: 768px) {
+    nav { padding: 14px 20px; }
+    .nav-links { display: none; }
+    section { padding: 70px 20px; }
+    .how-wrap { grid-template-columns: 1fr; gap: 40px; }
+    .stats { border-radius: 14px; }
+    .stat { min-width: 120px; padding: 20px 14px; }
+    footer { flex-direction: column; gap: 16px; text-align: center; padding: 30px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">
+    <div class="logo-icon">✈️</div>
+    <span class="logo-text">TravelBud</span>
+  </a>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#how">How it works</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#waitlist" class="nav-cta">Join Waitlist</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge"><span></span> Now in development · Join the waitlist</div>
+  <h1>Travel more.<br>Spend <span class="grad">way less.</span></h1>
+  <p>TravelBud's AI finds you the cheapest flights, best budget hotels, and builds your perfect itinerary — in seconds.</p>
+  <div class="hero-btns">
+    <a href="#waitlist" class="btn-primary">🚀 Get Early Access</a>
+    <a href="#features" class="btn-secondary">See how it works →</a>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-num">$0</div>
+      <div class="stat-label">Free to start</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">AI</div>
+      <div class="stat-label">Powered planning</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">4-in-1</div>
+      <div class="stat-label">All-in-one app</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">✈️</div>
+      <div class="stat-label">Real flight data</div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-label">What TravelBud does</div>
+  <h2 class="section-title">Everything you need.<br>Nothing you don't.</h2>
+  <p class="section-sub">One app that replaces five tabs, three apps, and hours of searching.</p>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">✈️</div>
+      <div class="feature-title">Cheap Flight Finder</div>
+      <div class="feature-desc">Real-time flight data powered by Amadeus. See the cheapest options ranked instantly, with AI telling you which deal is actually worth taking.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🗺️</div>
+      <div class="feature-title">AI Trip Planner</div>
+      <div class="feature-desc">Tell us your destination and budget. Get a full day-by-day itinerary with real places, local food, free activities, and hidden gems.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🏨</div>
+      <div class="feature-title">Budget Hotel Finder</div>
+      <div class="feature-desc">From hostels to hidden guesthouses — AI finds the best stays for your price range and tells you exactly which neighborhoods to pick.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">💰</div>
+      <div class="feature-title">Live Budget Tracker</div>
+      <div class="feature-desc">Log expenses on the go. See your budget bar in real time. Get AI coaching when you're spending too fast — before it's too late.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🤖</div>
+      <div class="feature-title">AI Travel Advisor</div>
+      <div class="feature-desc">Ask anything. Best time to visit? Visa requirements? What to pack? TravelBud's AI has answers tailored to your budget and travel style.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📱</div>
+      <div class="feature-title">Mobile App Coming</div>
+      <div class="feature-desc">iOS and Android app launching soon. Join the waitlist to get notified first and lock in the early adopter price forever.</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" style="max-width:1100px;margin:0 auto;padding:100px 24px;">
+  <div class="how-wrap">
+    <div>
+      <div class="section-label">How it works</div>
+      <h2 class="section-title">From idea to itinerary in 60 seconds.</h2>
+      <div class="steps" style="margin-top:40px;">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h3>Tell us where you want to go</h3>
+            <p>Enter your destination, dates, and total budget. That's it — no signup walls or endless forms.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h3>AI searches everything at once</h3>
+            <p>TravelBud scans real flight data, hotel options, and local activities simultaneously — not one at a time.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h3>Get your personalized plan</h3>
+            <p>Receive a complete trip plan: cheapest flights ranked, budget stays, day-by-day itinerary, all in one view.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <h3>Track spending on the go</h3>
+            <p>Log expenses as you travel. AI keeps you on budget and suggests adjustments in real time.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone-mock">
+      <div class="phone-header">
+        <div class="phone-dot" style="background:#ff4d6d"></div>
+        <div class="phone-dot" style="background:#ffb340"></div>
+        <div class="phone-dot" style="background:#00e5a0"></div>
+        <span style="color:var(--muted);font-size:13px;margin-left:8px;">✈️ JFK → LHR · Jul 15</span>
+      </div>
+      <p style="color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;margin-bottom:12px;">3 flights found</p>
+      <div class="mock-result best">
+        <div>
+          <div class="mock-badge">CHEAPEST ✓</div>
+          <div class="mock-airline">AA · American Airlines</div>
+          <div class="mock-route">8h 20m · Nonstop</div>
+        </div>
+        <div style="text-align:right">
+          <div class="mock-price best">$389</div>
+        </div>
+      </div>
+      <div class="mock-result">
+        <div>
+          <div class="mock-airline">BA · British Airways</div>
+          <div class="mock-route">7h 55m · Nonstop</div>
+        </div>
+        <div style="text-align:right">
+          <div class="mock-price" style="color:var(--yellow)">$441</div>
+        </div>
+      </div>
+      <div class="mock-result">
+        <div>
+          <div class="mock-airline">VS · Virgin Atlantic</div>
+          <div class="mock-route">8h 10m · Nonstop</div>
+        </div>
+        <div style="text-align:right">
+          <div class="mock-price" style="color:var(--yellow)">$467</div>
+        </div>
+      </div>
+      <div style="margin-top:16px;background:#0a1628;border:1px solid #00c2ff33;border-radius:10px;padding:14px;">
+        <p style="color:var(--accent);font-size:11px;font-weight:700;margin-bottom:6px;">✨ AI SAYS</p>
+        <p style="color:var(--muted2);font-size:13px;line-height:1.6;">The AA flight is your best bet — $52 cheaper with the same flight time. Book now, prices rise 14 days out. 🎯</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div style="text-align:center;">
+    <div class="section-label">Pricing</div>
+    <h2 class="section-title">Start free. Upgrade when you're ready.</h2>
+    <p class="section-sub" style="margin:0 auto;">No credit card needed to get started. Built for broke travelers first.</p>
+  </div>
+
+  <div class="pricing-grid">
+    <div class="price-card">
+      <div class="price-name">Free</div>
+      <div class="price-amount">$0<span>/mo</span></div>
+      <div class="price-desc">Perfect for occasional travelers</div>
+      <ul class="price-features">
+        <li>5 flight searches per month</li>
+        <li>AI trip planner (3 trips)</li>
+        <li>Basic budget tracker</li>
+        <li>Hotel recommendations</li>
+      </ul>
+      <a href="#waitlist" class="price-btn outline">Join Waitlist</a>
+    </div>
+    <div class="price-card popular">
+      <div class="popular-badge">⚡ Most Popular</div>
+      <div class="price-name">Explorer</div>
+      <div class="price-amount">$7<span>/mo</span></div>
+      <div class="price-desc">For the real travel addicts</div>
+      <ul class="price-features">
+        <li>Unlimited flight searches</li>
+        <li>Unlimited AI trip plans</li>
+        <li>Real-time budget tracking</li>
+        <li>Price drop alerts</li>
+        <li>Offline access</li>
+        <li>Priority AI responses</li>
+      </ul>
+      <a href="#waitlist" class="price-btn filled">Get Early Access</a>
+    </div>
+    <div class="price-card">
+      <div class="price-name">Group</div>
+      <div class="price-amount">$15<span>/mo</span></div>
+      <div class="price-desc">Travel together, save together</div>
+      <ul class="price-features">
+        <li>Everything in Explorer</li>
+        <li>Up to 6 travelers</li>
+        <li>Group budget splitting</li>
+        <li>Shared itineraries</li>
+        <li>Group chat with AI</li>
+      </ul>
+      <a href="#waitlist" class="price-btn outline">Join Waitlist</a>
+    </div>
+  </div>
+</section>
+
+<!-- WAITLIST -->
+<div class="waitlist-wrap" id="waitlist">
+  <div class="waitlist-inner">
+    <div class="section-label" style="text-align:center;">Early access</div>
+    <h2 class="section-title">Be first. Travel better.</h2>
+    <p style="color:var(--muted2);font-size:17px;line-height:1.65;margin-top:12px;">Join the waitlist and get free Explorer access for 3 months when we launch. No spam, ever.</p>
+    <div class="waitlist-form">
+      <input type="email" class="waitlist-input" id="email-input" placeholder="your@email.com"/>
+      <button class="btn-primary" onclick="joinWaitlist()" style="white-space:nowrap;">🚀 Join Waitlist</button>
+    </div>
+    <div id="waitlist-success">🎉 You're on the list! We'll be in touch soon.</div>
+    <p style="color:var(--muted);font-size:12px;margin-top:20px;">No credit card. No spam. Unsubscribe anytime.</p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="logo">
+    <div class="logo-icon" style="width:28px;height:28px;font-size:14px;">✈️</div>
+    <span class="logo-text" style="font-size:16px;">TravelBud</span>
+  </div>
+  <div style="color:var(--muted);font-size:13px;">© 2025 TravelBud · travelbud.online</div>
+  <div style="display:flex;gap:20px;">
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+    <a href="mailto:hello@travelbud.online">Contact</a>
+  </div>
+</footer>
+
+<script>
+function joinWaitlist() {
+  const email = document.getElementById('email-input').value;
+  if (!email || !email.includes('@')) {
+    document.getElementById('email-input').style.borderColor = '#ff4d6d';
+    return;
+  }
+  document.getElementById('email-input').style.display = 'none';
+  document.querySelector('.waitlist-form .btn-primary').style.display = 'none';
+  document.getElementById('waitlist-success').style.display = 'block';
+  // In production: send to your backend / email service
+  console.log('Waitlist signup:', email);
+}
+document.getElementById('email-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') joinWaitlist();
+});
+// Smooth active nav
+window.addEventListener('scroll', () => {
+  const nav = document.querySelector('nav');
+  nav.style.background = window.scrollY > 50 ? 'rgba(7,9,15,0.97)' : 'rgba(7,9,15,0.85)';
+});
+</script>
+</body>
+</html
